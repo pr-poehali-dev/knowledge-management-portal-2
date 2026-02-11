@@ -29,6 +29,7 @@ interface KnowledgeSidebarProps {
   handleRename: (nodeId: string, newName: string) => void;
   handleDelete: (nodeId: string) => void;
   setShowAddDialog: (dialog: { parentId: string | null; type: 'folder' | 'document' } | null) => void;
+  onOpenDocument: (nodeId: string) => void;
 }
 
 const KnowledgeSidebar = ({
@@ -48,6 +49,7 @@ const KnowledgeSidebar = ({
   handleRename,
   handleDelete,
   setShowAddDialog,
+  onOpenDocument,
 }: KnowledgeSidebarProps) => {
   const renderFolderTree = (nodes: FolderNode[], level = 0) => {
     return nodes.map((node) => (
@@ -64,6 +66,11 @@ const KnowledgeSidebar = ({
                 toggleFolder(node.id);
               } else {
                 setSelectedDocument(node.id);
+              }
+            }}
+            onDoubleClick={() => {
+              if (node.type === 'document') {
+                onOpenDocument(node.id);
               }
             }}
           >

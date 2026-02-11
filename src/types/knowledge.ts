@@ -12,6 +12,19 @@ export interface Document {
   direction: Direction;
 }
 
+export interface TableCell {
+  content: string;
+}
+
+export interface TableRow {
+  cells: TableCell[];
+}
+
+export interface DocumentContent {
+  text: string;
+  tables: TableRow[][];
+}
+
 export interface FolderNode {
   id: string;
   name: string;
@@ -19,6 +32,7 @@ export interface FolderNode {
   children?: FolderNode[];
   documentType?: DocumentType;
   direction: Direction;
+  content?: DocumentContent;
 }
 
 export const initialFolderStructures: Record<Direction, FolderNode[]> = {
@@ -29,7 +43,24 @@ export const initialFolderStructures: Record<Direction, FolderNode[]> = {
       type: 'folder',
       direction: 'safe-city',
       children: [
-        { id: '1-1', name: 'Настройка камер', type: 'document', documentType: 'instruction', direction: 'safe-city' },
+        { 
+          id: '1-1', 
+          name: 'Настройка камер', 
+          type: 'document', 
+          documentType: 'instruction', 
+          direction: 'safe-city',
+          content: {
+            text: '# Инструкция по настройке камер видеонаблюдения\n\n## Введение\n\nДанная инструкция описывает процедуру установки и настройки IP-камер видеонаблюдения системы "Безопасный город".\n\n## Требования\n\n- Камера должна быть подключена к сети питания\n- Наличие подключения к локальной сети\n- ПО для настройки камер установлено на рабочей станции\n\n## Порядок действий\n\n1. Подключите камеру к источнику питания\n2. Подключите сетевой кабель\n3. Откройте ПО для настройки\n4. Найдите камеру в сети\n5. Задайте параметры согласно таблице ниже',
+            tables: [[
+              { cells: [{ content: 'Параметр' }, { content: 'Значение' }, { content: 'Примечание' }] },
+              { cells: [{ content: 'IP-адрес' }, { content: '192.168.1.x' }, { content: 'Согласно схеме сети' }] },
+              { cells: [{ content: 'Маска подсети' }, { content: '255.255.255.0' }, { content: 'Стандартная' }] },
+              { cells: [{ content: 'Шлюз' }, { content: '192.168.1.1' }, { content: 'Основной шлюз' }] },
+              { cells: [{ content: 'Разрешение' }, { content: '1920x1080' }, { content: 'Full HD' }] },
+              { cells: [{ content: 'FPS' }, { content: '25' }, { content: 'Кадров в секунду' }] }
+            ]]
+          }
+        },
         { id: '1-2', name: 'Видеоаналитика', type: 'document', documentType: 'instruction', direction: 'safe-city' },
         { id: '1-3', name: 'Архив записей', type: 'document', documentType: 'reference', direction: 'safe-city' }
       ]

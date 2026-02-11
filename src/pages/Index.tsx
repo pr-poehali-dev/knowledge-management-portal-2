@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { DocumentType, Direction, Document, FolderNode, initialFolderStructures } from '@/types/knowledge';
+import { DocumentType, Direction, Document, FolderNode, initialFolderStructures, DocumentContent } from '@/types/knowledge';
 import KnowledgeSidebar from '@/components/KnowledgeSidebar';
 import DocumentGrid from '@/components/DocumentGrid';
 import AddItemDialog from '@/components/AddItemDialog';
+import DocumentEditor from '@/components/DocumentEditor';
 
 const Index = () => {
   const [selectedDirection, setSelectedDirection] = useState<Direction>('safe-city');
@@ -10,6 +11,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['1', '2', '3']));
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [openedDocument, setOpenedDocument] = useState<FolderNode | null>(null);
   const [showFlowEditor, setShowFlowEditor] = useState(false);
   const [folderStructures, setFolderStructures] = useState<Record<Direction, FolderNode[]>>(initialFolderStructures);
   const [editingNode, setEditingNode] = useState<{ id: string; name: string; type: 'folder' | 'document' } | null>(null);
@@ -151,7 +153,10 @@ const Index = () => {
       name: newItemName,
       type: showAddDialog.type,
       direction: selectedDirection,
-      ...(showAddDialog.type === 'folder' ? { children: [] } : { documentType: newItemDocType }),
+      ...(showAddDialog.type === 'folder' ? { children: [] } : { 
+        documentType: newItemDocType,
+        content: { text: '', tables: [] }
+      }),
     };
 
     setFolderStructures({
@@ -162,6 +167,36 @@ const Index = () => {
     setShowAddDialog(null);
     setNewItemName('');
     setNewItemDocType('instruction');
+  };
+
+  const findNodeById = (nodes: FolderNode[], id: string): FolderNode | null => {
+    for (const node of nodes) {
+      if (node.id === id) return node;
+      if (node.children) {
+        const found = findNodeById(node.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const handleOpenDocument = (nodeId: string) => {
+    const node = findNodeById(folderStructure, nodeId);
+    if (node && node.type === 'document') {
+      setOpenedDocument(node);
+    }
+  };
+
+  const handleSaveDocument = (content: DocumentContent) => {
+    if (!openedDocument) return;
+    setFolderStructures({
+      ...folderStructures,
+      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
+        ...node,
+        content,
+      })),
+    });
+    setOpenedDocument({ ...openedDocument, content });
   };
 
   const filteredDocuments = sampleDocuments.filter((doc) => {
@@ -193,14 +228,25 @@ const Index = () => {
         handleRename={handleRename}
         handleDelete={handleDelete}
         setShowAddDialog={setShowAddDialog}
+        onOpenDocument={handleOpenDocument}
       />
 
-      <DocumentGrid
-        selectedSection={selectedSection}
-        filteredDocuments={filteredDocuments}
-        showFlowEditor={showFlowEditor}
-        setShowFlowEditor={setShowFlowEditor}
-      />
+      {openedDocument ? (
+        <DocumentEditor
+          documentId={openedDocument.id}
+          documentName={openedDocument.name}
+          content={openedDocument.content || { text: '', tables: [] }}
+          onSave={handleSaveDocument}
+          onClose={() => setOpenedDocument(null)}
+        />
+      ) : (
+        <DocumentGrid
+          selectedSection={selectedSection}
+          filteredDocuments={filteredDocuments}
+          showFlowEditor={showFlowEditor}
+          setShowFlowEditor={setShowFlowEditor}
+        />
+      )}
 
       <AddItemDialog
         showAddDialog={showAddDialog}
