@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DocumentType, Direction, Document, FolderNode, initialFolderStructures, DocumentContent } from '@/types/knowledge';
+import { DocumentType, Direction, Document, FolderNode, initialFolderStructures, DocumentContent, DocumentVersion, DocumentMetrics, DocumentAttachment } from '@/types/knowledge';
 import KnowledgeSidebar from '@/components/KnowledgeSidebar';
 import DocumentGrid from '@/components/DocumentGrid';
 import AddItemDialog from '@/components/AddItemDialog';
@@ -151,6 +151,7 @@ const Index = () => {
 
     const docType = showAddDialog.parentId === null ? currentDocType : newItemDocType;
 
+    const now = new Date().toLocaleDateString('ru-RU');
     const newNode: FolderNode = {
       id: `new-${Date.now()}`,
       name: newItemName,
@@ -158,7 +159,17 @@ const Index = () => {
       direction: selectedDirection,
       ...(showAddDialog.type === 'folder' ? { children: [] } : { 
         documentType: docType,
-        content: { text: '', tables: [] }
+        content: { text: '', tables: [] },
+        author: 'Текущий пользователь',
+        tags: [],
+        metrics: {
+          views: 0,
+          createdAt: now,
+          updatedAt: now,
+          editCount: 0
+        },
+        versions: [],
+        attachments: []
       }),
     };
 
@@ -208,6 +219,57 @@ const Index = () => {
     setOpenedDocument({ ...openedDocument, content });
   };
 
+  const handleUpdateVersions = (versions: DocumentVersion[]) => {
+    if (!openedDocument) return;
+    setFolderStructures({
+      ...folderStructures,
+      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
+        ...node,
+        versions,
+      })),
+    });
+    setOpenedDocument({ ...openedDocument, versions });
+  };
+
+  const handleUpdateMetrics = (metrics: DocumentMetrics) => {
+    if (!openedDocument) return;
+    setFolderStructures({
+      ...folderStructures,
+      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
+        ...node,
+        metrics,
+      })),
+    });
+    setOpenedDocument({ ...openedDocument, metrics });
+  };
+
+  const handleUpdateAttachments = (attachments: DocumentAttachment[]) => {
+    if (!openedDocument) return;
+    setFolderStructures({
+      ...folderStructures,
+      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
+        ...node,
+        attachments,
+      })),
+    });
+    setOpenedDocument({ ...openedDocument, attachments });
+  };
+
+  const getAllDocuments = (nodes: FolderNode[]): FolderNode[] => {
+    let docs: FolderNode[] = [];
+    for (const node of nodes) {
+      if (node.type === 'document') {
+        docs.push(node);
+      }
+      if (node.children) {
+        docs = [...docs, ...getAllDocuments(node.children)];
+      }
+    }
+    return docs;
+  };
+
+  const allDocuments = getAllDocuments(folderStructure);
+
   const filteredDocuments = sampleDocuments.filter((doc) => {
     const matchesDirection = doc.direction === selectedDirection;
     const matchesSection = doc.type === selectedSection;
@@ -216,6 +278,18 @@ const Index = () => {
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDirection && matchesSection && matchesSearch;
+  });
+
+  const filteredFolderDocuments = allDocuments.filter((doc) => {
+    if (!doc.documentType || doc.documentType !== selectedSection) return false;
+    if (searchQuery === '') return true;
+    
+    const query = searchQuery.toLowerCase();
+    const matchesName = doc.name.toLowerCase().includes(query);
+    const matchesContent = doc.content?.text.toLowerCase().includes(query) || false;
+    const matchesTags = doc.tags?.some(tag => tag.toLowerCase().includes(query)) || false;
+    
+    return matchesName || matchesContent || matchesTags;
   });
 
   return (
@@ -249,13 +323,23 @@ const Index = () => {
           content={openedDocument.content || { text: '', tables: [] }}
           onSave={handleSaveDocument}
           onClose={() => setOpenedDocument(null)}
+          allDocuments={allDocuments}
+          onOpenDocument={handleOpenDocument}
+          versions={openedDocument.versions || []}
+          metrics={openedDocument.metrics}
+          attachments={openedDocument.attachments || []}
+          onUpdateVersions={handleUpdateVersions}
+          onUpdateMetrics={handleUpdateMetrics}
+          onUpdateAttachments={handleUpdateAttachments}
         />
       ) : (
         <DocumentGrid
           selectedSection={selectedSection}
           filteredDocuments={filteredDocuments}
+          filteredFolderDocuments={filteredFolderDocuments}
           showFlowEditor={showFlowEditor}
           setShowFlowEditor={setShowFlowEditor}
+          onOpenDocument={handleOpenDocument}
         />
       )}
 

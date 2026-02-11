@@ -4,16 +4,19 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Document, DocumentType } from '@/types/knowledge';
+import { Document, DocumentType, FolderNode } from '@/types/knowledge';
 
 interface DocumentGridProps {
   selectedSection: DocumentType;
   filteredDocuments: Document[];
+  filteredFolderDocuments: FolderNode[];
   showFlowEditor: boolean;
   setShowFlowEditor: (show: boolean) => void;
+  onOpenDocument: (nodeId: string) => void;
 }
 
-const DocumentGrid = ({ selectedSection, filteredDocuments, showFlowEditor, setShowFlowEditor }: DocumentGridProps) => {
+const DocumentGrid = ({ selectedSection, filteredDocuments, filteredFolderDocuments, showFlowEditor, setShowFlowEditor, onOpenDocument }: DocumentGridProps) => {
+  const combinedCount = filteredDocuments.length + filteredFolderDocuments.length;
   return (
     <main className="flex-1 flex flex-col overflow-hidden">
       <header className="h-16 border-b bg-card px-6 flex items-center justify-between">
@@ -25,7 +28,7 @@ const DocumentGrid = ({ selectedSection, filteredDocuments, showFlowEditor, setS
             {selectedSection === 'reference' && 'Справочник'}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {filteredDocuments.length} {filteredDocuments.length === 1 ? 'документ' : 'документов'}
+            {combinedCount} {combinedCount === 1 ? 'документ' : 'документов'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -109,6 +112,62 @@ const DocumentGrid = ({ selectedSection, filteredDocuments, showFlowEditor, setS
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredFolderDocuments.map((doc) => (
+              <Card key={doc.id} className="p-5 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onOpenDocument(doc.id)}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Icon
+                        name={
+                          doc.documentType === 'instruction'
+                            ? 'FileText'
+                            : doc.documentType === 'process'
+                            ? 'GitBranch'
+                            : doc.documentType === 'document'
+                            ? 'File'
+                            : 'Book'
+                        }
+                        size={20}
+                        className="text-primary"
+                      />
+                    </div>
+                  </div>
+                  {doc.metrics && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Icon name="Eye" size={12} className="mr-1" />
+                      {doc.metrics.views}
+                    </Badge>
+                  )}
+                </div>
+
+                <h3 className="font-semibold mb-2 line-clamp-2">{doc.name}</h3>
+
+                {doc.tags && doc.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {doc.tags.map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                <Separator className="my-3" />
+
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Icon name="User" size={14} />
+                    <span>{doc.author || 'Неизвестно'}</span>
+                  </div>
+                  {doc.metrics && (
+                    <div className="flex items-center gap-1">
+                      <Icon name="Calendar" size={14} />
+                      <span>{doc.metrics.updatedAt}</span>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
             {filteredDocuments.map((doc) => (
               <Card key={doc.id} className="p-5 hover:shadow-lg transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between mb-3">

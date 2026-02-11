@@ -6,7 +6,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { DocumentContent, TableRow } from '@/types/knowledge';
+import { DocumentContent, TableRow, FolderNode, DocumentVersion, DocumentMetrics as MetricsType, DocumentAttachment } from '@/types/knowledge';
+import RelatedDocuments from './RelatedDocuments';
+import VersionHistory from './VersionHistory';
+import DocumentMetrics from './DocumentMetrics';
+import FileAttachments from './FileAttachments';
 
 interface DocumentEditorProps {
   documentId: string;
@@ -14,16 +18,121 @@ interface DocumentEditorProps {
   content: DocumentContent;
   onSave: (content: DocumentContent) => void;
   onClose: () => void;
+  allDocuments?: FolderNode[];
+  onOpenDocument?: (docId: string) => void;
+  versions?: DocumentVersion[];
+  metrics?: MetricsType;
+  attachments?: DocumentAttachment[];
+  onUpdateVersions?: (versions: DocumentVersion[]) => void;
+  onUpdateMetrics?: (metrics: MetricsType) => void;
+  onUpdateAttachments?: (attachments: DocumentAttachment[]) => void;
 }
 
-const DocumentEditor = ({ documentName, content, onSave, onClose }: DocumentEditorProps) => {
+const DocumentEditor = ({ 
+  documentName, 
+  content, 
+  onSave, 
+  onClose,
+  allDocuments = [],
+  onOpenDocument,
+  versions = [],
+  metrics,
+  attachments = [],
+  onUpdateVersions,
+  onUpdateMetrics,
+  onUpdateAttachments
+}: DocumentEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState<DocumentContent>(content);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const handleSave = () => {
     onSave(editedContent);
     setIsEditing(false);
+    
+    if (onUpdateMetrics && metrics) {
+      onUpdateMetrics({
+        ...metrics,
+        updatedAt: new Date().toLocaleDateString('ru-RU'),
+        editCount: metrics.editCount + 1
+      });
+    }
+  };
+
+  const handleAddRelatedDoc = (docId: string) => {
+    const relatedDocs = editedContent.relatedDocuments || [];
+    setEditedContent({
+      ...editedContent,
+      relatedDocuments: [...relatedDocs, docId]
+    });
+  };
+
+  const handleRemoveRelatedDoc = (docId: string) => {
+    const relatedDocs = editedContent.relatedDocuments || [];
+    setEditedContent({
+      ...editedContent,
+      relatedDocuments: relatedDocs.filter(id => id !== docId)
+    });
+  };
+
+  const handleSaveVersion = (comment: string) => {
+    if (!onUpdateVersions) return;
+    const newVersion: DocumentVersion = {
+      id: `v-${Date.now()}`,
+      timestamp: new Date().toLocaleString('ru-RU'),
+      author: 'Текущий пользователь',
+      content: editedContent,
+      comment
+    };
+    onUpdateVersions([...versions, newVersion]);
+  };
+
+  const handleRestoreVersion = (version: DocumentVersion) => {
+    setEditedContent(version.content);
+    onSave(version.content);
+  };
+
+  const handleAddAttachment = (file: File) => {
+    if (!onUpdateAttachments) return;
+    const fileType = file.name.endsWith('.pdf') ? 'pdf' :
+                     file.name.endsWith('.doc') || file.name.endsWith('.docx') ? 'word' :
+                     file.name.endsWith('.xls') || file.name.endsWith('.xlsx') ? 'excel' :
+                     file.type.startsWith('image/') ? 'image' : 'other';
+    
+    const newAttachment: DocumentAttachment = {
+      id: `att-${Date.now()}`,
+      name: file.name,
+      type: fileType,
+      size: file.size,
+      url: URL.createObjectURL(file),
+      uploadedAt: new Date().toLocaleDateString('ru-RU'),
+      uploadedBy: 'Текущий пользователь'
+    };
+    onUpdateAttachments([...attachments, newAttachment]);
+  };
+
+  const handleRemoveAttachment = (attachmentId: string) => {
+    if (!onUpdateAttachments) return;
+    onUpdateAttachments(attachments.filter(att => att.id !== attachmentId));
+  };
+
+  const handleDownloadAttachment = (attachment: DocumentAttachment) => {
+    const link = document.createElement('a');
+    link.href = attachment.url;
+    link.download = attachment.name;
+    link.click();
+  };
+
+  const handleExport = (format: 'pdf' | 'word' | 'excel') => {
+    const text = editedContent.text;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${documentName}.${format === 'word' ? 'doc' : format === 'excel' ? 'xlsx' : 'pdf'}`;
+    link.click();
+    setShowExportMenu(false);
   };
 
   const addTable = () => {
@@ -115,14 +224,40 @@ const DocumentEditor = ({ documentName, content, onSave, onClose }: DocumentEdit
             </>
           ) : (
             <>
+              {onUpdateVersions && (
+                <VersionHistory
+                  versions={versions}
+                  currentContent={editedContent}
+                  onRestore={handleRestoreVersion}
+                  onSaveAsVersion={handleSaveVersion}
+                />
+              )}
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 <Icon name="Pencil" size={18} className="mr-2" />
                 Редактировать
               </Button>
-              <Button variant="outline">
-                <Icon name="Download" size={18} className="mr-2" />
-                Экспорт
-              </Button>
+              <div className="relative">
+                <Button variant="outline" onClick={() => setShowExportMenu(!showExportMenu)}>
+                  <Icon name="Download" size={18} className="mr-2" />
+                  Экспорт
+                </Button>
+                {showExportMenu && (
+                  <Card className="absolute right-0 top-12 z-50 p-2 w-40">
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => handleExport('pdf')}>
+                      <Icon name="FileText" size={14} className="mr-2" />
+                      PDF
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => handleExport('word')}>
+                      <Icon name="FileText" size={14} className="mr-2" />
+                      Word
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => handleExport('excel')}>
+                      <Icon name="Table" size={14} className="mr-2" />
+                      Excel
+                    </Button>
+                  </Card>
+                )}
+              </div>
             </>
           )}
         </div>
@@ -283,6 +418,39 @@ const DocumentEditor = ({ documentName, content, onSave, onClose }: DocumentEdit
               </div>
             )}
           </Card>
+
+          {metrics && (
+            <div className="mt-6">
+              <DocumentMetrics metrics={metrics} />
+            </div>
+          )}
+
+          {allDocuments.length > 0 && onOpenDocument && (
+            <div className="mt-6">
+              <Card className="p-6">
+                <RelatedDocuments
+                  relatedIds={editedContent.relatedDocuments || []}
+                  allDocuments={allDocuments}
+                  onAdd={handleAddRelatedDoc}
+                  onRemove={handleRemoveRelatedDoc}
+                  onOpen={onOpenDocument}
+                />
+              </Card>
+            </div>
+          )}
+
+          {onUpdateAttachments && (
+            <div className="mt-6">
+              <Card className="p-6">
+                <FileAttachments
+                  attachments={attachments}
+                  onAdd={handleAddAttachment}
+                  onRemove={handleRemoveAttachment}
+                  onDownload={handleDownloadAttachment}
+                />
+              </Card>
+            </div>
+          )}
         </div>
       </ScrollArea>
     </div>

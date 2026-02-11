@@ -20,9 +20,36 @@ export interface TableRow {
   cells: TableCell[];
 }
 
+export interface DocumentVersion {
+  id: string;
+  timestamp: string;
+  author: string;
+  content: DocumentContent;
+  comment?: string;
+}
+
+export interface DocumentMetrics {
+  views: number;
+  lastViewed?: string;
+  createdAt: string;
+  updatedAt: string;
+  editCount: number;
+}
+
+export interface DocumentAttachment {
+  id: string;
+  name: string;
+  type: 'pdf' | 'word' | 'excel' | 'image' | 'other';
+  size: number;
+  url: string;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
 export interface DocumentContent {
   text: string;
   tables: TableRow[][];
+  relatedDocuments?: string[];
 }
 
 export interface FolderNode {
@@ -33,6 +60,11 @@ export interface FolderNode {
   documentType?: DocumentType;
   direction: Direction;
   content?: DocumentContent;
+  versions?: DocumentVersion[];
+  metrics?: DocumentMetrics;
+  attachments?: DocumentAttachment[];
+  author?: string;
+  tags?: string[];
 }
 
 export const initialFolderStructures: Record<Direction, FolderNode[]> = {
@@ -49,6 +81,15 @@ export const initialFolderStructures: Record<Direction, FolderNode[]> = {
           type: 'document', 
           documentType: 'instruction', 
           direction: 'safe-city',
+          author: 'Иванов И.И.',
+          tags: ['видеонаблюдение', 'настройка', 'камеры'],
+          metrics: {
+            views: 45,
+            lastViewed: '11.02.2026',
+            createdAt: '01.02.2026',
+            updatedAt: '10.02.2026',
+            editCount: 3
+          },
           content: {
             text: '# Инструкция по настройке камер видеонаблюдения\n\n## Введение\n\nДанная инструкция описывает процедуру установки и настройки IP-камер видеонаблюдения системы "Безопасный город".\n\n## Требования\n\n- Камера должна быть подключена к сети питания\n- Наличие подключения к локальной сети\n- ПО для настройки камер установлено на рабочей станции\n\n## Порядок действий\n\n1. Подключите камеру к источнику питания\n2. Подключите сетевой кабель\n3. Откройте ПО для настройки\n4. Найдите камеру в сети\n5. Задайте параметры согласно таблице ниже',
             tables: [[
