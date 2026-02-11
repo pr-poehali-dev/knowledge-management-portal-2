@@ -193,8 +193,6 @@ const Index = () => {
         handleRename={handleRename}
         handleDelete={handleDelete}
         setShowAddDialog={setShowAddDialog}
-        setShowFlowEditor={setShowFlowEditor}
-        showFlowEditor={showFlowEditor}
       />
 
       <DocumentGrid

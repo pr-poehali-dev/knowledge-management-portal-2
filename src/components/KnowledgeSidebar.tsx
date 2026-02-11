@@ -29,8 +29,6 @@ interface KnowledgeSidebarProps {
   handleRename: (nodeId: string, newName: string) => void;
   handleDelete: (nodeId: string) => void;
   setShowAddDialog: (dialog: { parentId: string | null; type: 'folder' | 'document' } | null) => void;
-  setShowFlowEditor: (show: boolean) => void;
-  showFlowEditor: boolean;
 }
 
 const KnowledgeSidebar = ({
@@ -50,8 +48,6 @@ const KnowledgeSidebar = ({
   handleRename,
   handleDelete,
   setShowAddDialog,
-  setShowFlowEditor,
-  showFlowEditor,
 }: KnowledgeSidebarProps) => {
   const renderFolderTree = (nodes: FolderNode[], level = 0) => {
     return nodes.map((node) => (
@@ -255,13 +251,6 @@ const KnowledgeSidebar = ({
           {renderFolderTree(folderStructure)}
         </div>
       </ScrollArea>
-
-      <div className="p-4 border-t">
-        <Button className="w-full" onClick={() => setShowFlowEditor(!showFlowEditor)}>
-          <Icon name="Plus" size={18} className="mr-2" />
-          Создать документ
-        </Button>
-      </div>
     </aside>
   );
 };
