@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 type DocumentType = 'instruction' | 'process' | 'document' | 'reference';
+type Direction = 'safe-city' | 'transport';
 
 interface Document {
   id: string;
@@ -17,6 +18,7 @@ interface Document {
   author: string;
   lastModified: string;
   tags: string[];
+  direction: Direction;
 }
 
 interface FolderNode {
@@ -25,9 +27,11 @@ interface FolderNode {
   type: 'folder' | 'document';
   children?: FolderNode[];
   documentType?: DocumentType;
+  direction: Direction;
 }
 
 const Index = () => {
+  const [selectedDirection, setSelectedDirection] = useState<Direction>('safe-city');
   const [selectedSection, setSelectedSection] = useState<DocumentType>('instruction');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['1', '2', '3']));
@@ -42,7 +46,8 @@ const Index = () => {
       folder: 'Инфраструктура',
       author: 'Иванов И.И.',
       lastModified: '10.02.2026',
-      tags: ['сервер', 'dell', 'настройка']
+      tags: ['сервер', 'dell', 'настройка'],
+      direction: 'safe-city'
     },
     {
       id: '2',
@@ -51,7 +56,8 @@ const Index = () => {
       folder: 'Закупки',
       author: 'Петрова А.С.',
       lastModified: '09.02.2026',
-      tags: ['закупка', 'согласование', 'оборудование']
+      tags: ['закупка', 'согласование', 'оборудование'],
+      direction: 'safe-city'
     },
     {
       id: '3',
@@ -60,7 +66,8 @@ const Index = () => {
       folder: 'Делопроизводство',
       author: 'Сидоров П.К.',
       lastModified: '08.02.2026',
-      tags: ['регламент', 'документы']
+      tags: ['регламент', 'документы'],
+      direction: 'transport'
     },
     {
       id: '4',
@@ -69,50 +76,101 @@ const Index = () => {
       folder: 'Инфраструктура',
       author: 'Козлов Д.В.',
       lastModified: '11.02.2026',
-      tags: ['сеть', 'ip', 'оборудование']
+      tags: ['сеть', 'ip', 'оборудование'],
+      direction: 'transport'
+    },
+    {
+      id: '5',
+      title: 'Инструкция по работе с видеоаналитикой',
+      type: 'instruction',
+      folder: 'Безопасный город',
+      author: 'Смирнов А.П.',
+      lastModified: '11.02.2026',
+      tags: ['видеоаналитика', 'камеры', 'безопасность'],
+      direction: 'safe-city'
+    },
+    {
+      id: '6',
+      title: 'Настройка системы управления светофорами',
+      type: 'instruction',
+      folder: 'ИТС',
+      author: 'Морозов В.Л.',
+      lastModified: '10.02.2026',
+      tags: ['светофоры', 'управление', 'транспорт'],
+      direction: 'transport'
     }
   ];
 
-  const folderStructure: FolderNode[] = [
-    {
-      id: '1',
-      name: 'Инфраструктурные системы',
-      type: 'folder',
-      children: [
-        { id: '1-1', name: 'Настройка серверов', type: 'document', documentType: 'instruction' },
-        { id: '1-2', name: 'Сетевое оборудование', type: 'document', documentType: 'instruction' },
-        { id: '1-3', name: 'Мониторинг систем', type: 'document', documentType: 'instruction' }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Делопроизводство',
-      type: 'folder',
-      children: [
-        { id: '2-1', name: 'Входящие документы', type: 'document', documentType: 'process' },
-        { id: '2-2', name: 'Исходящие документы', type: 'document', documentType: 'process' },
-        { id: '2-3', name: 'Архив', type: 'folder', children: [] }
-      ]
-    },
-    {
-      id: '3',
-      name: 'Закупки',
-      type: 'folder',
-      children: [
-        { id: '3-1', name: 'Процесс согласования', type: 'document', documentType: 'process' },
-        { id: '3-2', name: 'Шаблоны документов', type: 'document', documentType: 'document' }
-      ]
-    },
-    {
-      id: '4',
-      name: 'Юридическая служба',
-      type: 'folder',
-      children: [
-        { id: '4-1', name: 'Договоры', type: 'document', documentType: 'reference' },
-        { id: '4-2', name: 'Нормативные акты', type: 'document', documentType: 'reference' }
-      ]
-    }
-  ];
+  const folderStructures: Record<Direction, FolderNode[]> = {
+    'safe-city': [
+      {
+        id: '1',
+        name: 'Видеонаблюдение',
+        type: 'folder',
+        direction: 'safe-city',
+        children: [
+          { id: '1-1', name: 'Настройка камер', type: 'document', documentType: 'instruction', direction: 'safe-city' },
+          { id: '1-2', name: 'Видеоаналитика', type: 'document', documentType: 'instruction', direction: 'safe-city' },
+          { id: '1-3', name: 'Архив записей', type: 'document', documentType: 'reference', direction: 'safe-city' }
+        ]
+      },
+      {
+        id: '2',
+        name: 'Системы оповещения',
+        type: 'folder',
+        direction: 'safe-city',
+        children: [
+          { id: '2-1', name: 'Настройка громкоговорителей', type: 'document', documentType: 'instruction', direction: 'safe-city' },
+          { id: '2-2', name: 'Протоколы оповещения', type: 'document', documentType: 'process', direction: 'safe-city' }
+        ]
+      },
+      {
+        id: '3',
+        name: 'Инфраструктура',
+        type: 'folder',
+        direction: 'safe-city',
+        children: [
+          { id: '3-1', name: 'Серверное оборудование', type: 'document', documentType: 'instruction', direction: 'safe-city' },
+          { id: '3-2', name: 'Сетевая инфраструктура', type: 'document', documentType: 'reference', direction: 'safe-city' }
+        ]
+      }
+    ],
+    'transport': [
+      {
+        id: '4',
+        name: 'Светофорные объекты',
+        type: 'folder',
+        direction: 'transport',
+        children: [
+          { id: '4-1', name: 'Настройка контроллеров', type: 'document', documentType: 'instruction', direction: 'transport' },
+          { id: '4-2', name: 'Схемы управления', type: 'document', documentType: 'reference', direction: 'transport' },
+          { id: '4-3', name: 'Техническое обслуживание', type: 'document', documentType: 'process', direction: 'transport' }
+        ]
+      },
+      {
+        id: '5',
+        name: 'Детекторы транспорта',
+        type: 'folder',
+        direction: 'transport',
+        children: [
+          { id: '5-1', name: 'Установка датчиков', type: 'document', documentType: 'instruction', direction: 'transport' },
+          { id: '5-2', name: 'Калибровка', type: 'document', documentType: 'process', direction: 'transport' }
+        ]
+      },
+      {
+        id: '6',
+        name: 'АСУДД',
+        type: 'folder',
+        direction: 'transport',
+        children: [
+          { id: '6-1', name: 'Настройка центра управления', type: 'document', documentType: 'instruction', direction: 'transport' },
+          { id: '6-2', name: 'Алгоритмы управления', type: 'document', documentType: 'reference', direction: 'transport' }
+        ]
+      }
+    ]
+  };
+
+  const folderStructure = folderStructures[selectedDirection];
 
   const toggleFolder = (folderId: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -166,12 +224,13 @@ const Index = () => {
   };
 
   const filteredDocuments = sampleDocuments.filter((doc) => {
+    const matchesDirection = doc.direction === selectedDirection;
     const matchesSection = doc.type === selectedSection;
     const matchesSearch =
       searchQuery === '' ||
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesSection && matchesSearch;
+    return matchesDirection && matchesSection && matchesSearch;
   });
 
   return (
@@ -200,6 +259,30 @@ const Index = () => {
         </div>
 
         <ScrollArea className="flex-1 p-4">
+          <div className="mb-4">
+            <h3 className="text-xs font-semibold text-muted-foreground px-2 mb-2">НАПРАВЛЕНИЕ</h3>
+            <div className="space-y-1">
+              <Button
+                variant={selectedDirection === 'safe-city' ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={() => setSelectedDirection('safe-city')}
+              >
+                <Icon name="Shield" size={18} className="mr-2" />
+                Безопасный город
+              </Button>
+              <Button
+                variant={selectedDirection === 'transport' ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={() => setSelectedDirection('transport')}
+              >
+                <Icon name="Bus" size={18} className="mr-2" />
+                ИТС
+              </Button>
+            </div>
+          </div>
+
+          <Separator className="my-4" />
+
           <div className="space-y-1">
             <Button
               variant={selectedSection === 'instruction' ? 'default' : 'ghost'}
