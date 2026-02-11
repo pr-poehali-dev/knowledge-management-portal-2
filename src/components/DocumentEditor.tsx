@@ -425,20 +425,6 @@ const DocumentEditor = ({
             </div>
           )}
 
-          {allDocuments.length > 0 && onOpenDocument && (
-            <div className="mt-6">
-              <Card className="p-6">
-                <RelatedDocuments
-                  relatedIds={editedContent.relatedDocuments || []}
-                  allDocuments={allDocuments}
-                  onAdd={handleAddRelatedDoc}
-                  onRemove={handleRemoveRelatedDoc}
-                  onOpen={onOpenDocument}
-                />
-              </Card>
-            </div>
-          )}
-
           {onUpdateAttachments && (
             <div className="mt-6">
               <Card className="p-6">
