@@ -30,6 +30,8 @@ interface KnowledgeSidebarProps {
   handleDelete: (nodeId: string) => void;
   setShowAddDialog: (dialog: { parentId: string | null; type: 'folder' | 'document' } | null) => void;
   onOpenDocument: (nodeId: string) => void;
+  currentDocType: DocumentType;
+  setCurrentDocType: (type: DocumentType) => void;
 }
 
 const KnowledgeSidebar = ({
@@ -50,6 +52,8 @@ const KnowledgeSidebar = ({
   handleDelete,
   setShowAddDialog,
   onOpenDocument,
+  currentDocType,
+  setCurrentDocType,
 }: KnowledgeSidebarProps) => {
   const renderFolderTree = (nodes: FolderNode[], level = 0) => {
     return nodes.map((node) => (
@@ -198,38 +202,93 @@ const KnowledgeSidebar = ({
         <Separator className="my-4" />
 
         <div className="space-y-1">
-          <Button
-            variant={selectedSection === 'instruction' ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={() => setSelectedSection('instruction')}
-          >
-            <Icon name="FileText" size={18} className="mr-2" />
-            Инструкции
-          </Button>
-          <Button
-            variant={selectedSection === 'process' ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={() => setSelectedSection('process')}
-          >
-            <Icon name="GitBranch" size={18} className="mr-2" />
-            Процессы
-          </Button>
-          <Button
-            variant={selectedSection === 'document' ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={() => setSelectedSection('document')}
-          >
-            <Icon name="File" size={18} className="mr-2" />
-            Документы
-          </Button>
-          <Button
-            variant={selectedSection === 'reference' ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={() => setSelectedSection('reference')}
-          >
-            <Icon name="Book" size={18} className="mr-2" />
-            Справочник
-          </Button>
+          <div className="group flex items-center gap-1">
+            <Button
+              variant={selectedSection === 'instruction' ? 'default' : 'ghost'}
+              className="flex-1 justify-start"
+              onClick={() => setSelectedSection('instruction')}
+            >
+              <Icon name="FileText" size={18} className="mr-2" />
+              Инструкции
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => {
+                setCurrentDocType('instruction');
+                setShowAddDialog({ parentId: null, type: 'document' });
+              }}
+            >
+              <Icon name="Plus" size={16} />
+            </Button>
+          </div>
+          
+          <div className="group flex items-center gap-1">
+            <Button
+              variant={selectedSection === 'process' ? 'default' : 'ghost'}
+              className="flex-1 justify-start"
+              onClick={() => setSelectedSection('process')}
+            >
+              <Icon name="GitBranch" size={18} className="mr-2" />
+              Процессы
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => {
+                setCurrentDocType('process');
+                setShowAddDialog({ parentId: null, type: 'document' });
+              }}
+            >
+              <Icon name="Plus" size={16} />
+            </Button>
+          </div>
+          
+          <div className="group flex items-center gap-1">
+            <Button
+              variant={selectedSection === 'document' ? 'default' : 'ghost'}
+              className="flex-1 justify-start"
+              onClick={() => setSelectedSection('document')}
+            >
+              <Icon name="File" size={18} className="mr-2" />
+              Документы
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => {
+                setCurrentDocType('document');
+                setShowAddDialog({ parentId: null, type: 'document' });
+              }}
+            >
+              <Icon name="Plus" size={16} />
+            </Button>
+          </div>
+          
+          <div className="group flex items-center gap-1">
+            <Button
+              variant={selectedSection === 'reference' ? 'default' : 'ghost'}
+              className="flex-1 justify-start"
+              onClick={() => setSelectedSection('reference')}
+            >
+              <Icon name="Book" size={18} className="mr-2" />
+              Справочник
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => {
+                setCurrentDocType('reference');
+                setShowAddDialog({ parentId: null, type: 'document' });
+              }}
+            >
+              <Icon name="Plus" size={16} />
+            </Button>
+          </div>
         </div>
 
         <Separator className="my-4" />

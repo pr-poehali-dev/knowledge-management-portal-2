@@ -18,6 +18,7 @@ const Index = () => {
   const [showAddDialog, setShowAddDialog] = useState<{ parentId: string | null; type: 'folder' | 'document' } | null>(null);
   const [newItemName, setNewItemName] = useState('');
   const [newItemDocType, setNewItemDocType] = useState<DocumentType>('instruction');
+  const [currentDocType, setCurrentDocType] = useState<DocumentType>('instruction');
 
   const sampleDocuments: Document[] = [
     {
@@ -148,13 +149,15 @@ const Index = () => {
   const handleAdd = () => {
     if (!showAddDialog || !newItemName.trim()) return;
 
+    const docType = showAddDialog.parentId === null ? currentDocType : newItemDocType;
+
     const newNode: FolderNode = {
       id: `new-${Date.now()}`,
       name: newItemName,
       type: showAddDialog.type,
       direction: selectedDirection,
       ...(showAddDialog.type === 'folder' ? { children: [] } : { 
-        documentType: newItemDocType,
+        documentType: docType,
         content: { text: '', tables: [] }
       }),
     };
@@ -167,6 +170,12 @@ const Index = () => {
     setShowAddDialog(null);
     setNewItemName('');
     setNewItemDocType('instruction');
+
+    if (showAddDialog.type === 'document') {
+      setTimeout(() => {
+        handleOpenDocument(newNode.id);
+      }, 100);
+    }
   };
 
   const findNodeById = (nodes: FolderNode[], id: string): FolderNode | null => {
@@ -229,6 +238,8 @@ const Index = () => {
         handleDelete={handleDelete}
         setShowAddDialog={setShowAddDialog}
         onOpenDocument={handleOpenDocument}
+        currentDocType={currentDocType}
+        setCurrentDocType={setCurrentDocType}
       />
 
       {openedDocument ? (
@@ -256,6 +267,7 @@ const Index = () => {
         setNewItemDocType={setNewItemDocType}
         setShowAddDialog={setShowAddDialog}
         handleAdd={handleAdd}
+        currentDocType={currentDocType}
       />
     </div>
   );

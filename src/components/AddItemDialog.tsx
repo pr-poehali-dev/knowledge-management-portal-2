@@ -13,6 +13,7 @@ interface AddItemDialogProps {
   setNewItemDocType: (type: DocumentType) => void;
   setShowAddDialog: (dialog: { parentId: string | null; type: 'folder' | 'document' } | null) => void;
   handleAdd: () => void;
+  currentDocType?: DocumentType;
 }
 
 const AddItemDialog = ({
@@ -23,7 +24,10 @@ const AddItemDialog = ({
   setNewItemDocType,
   setShowAddDialog,
   handleAdd,
+  currentDocType,
 }: AddItemDialogProps) => {
+  const isRootDocument = showAddDialog?.parentId === null && showAddDialog?.type === 'document';
+  const displayDocType = isRootDocument ? currentDocType : newItemDocType;
   return (
     <Dialog open={showAddDialog !== null} onOpenChange={() => setShowAddDialog(null)}>
       <DialogContent>
@@ -42,7 +46,7 @@ const AddItemDialog = ({
               placeholder={showAddDialog?.type === 'folder' ? 'Название папки' : 'Название документа'}
             />
           </div>
-          {showAddDialog?.type === 'document' && (
+          {showAddDialog?.type === 'document' && !isRootDocument && (
             <div className="space-y-2">
               <Label htmlFor="doctype">Тип документа</Label>
               <Select value={newItemDocType} onValueChange={(value: DocumentType) => setNewItemDocType(value)}>
@@ -56,6 +60,11 @@ const AddItemDialog = ({
                   <SelectItem value="reference">Справочник</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          )}
+          {isRootDocument && (
+            <div className="text-sm text-muted-foreground">
+              Тип: {displayDocType === 'instruction' ? 'Инструкция' : displayDocType === 'process' ? 'Процесс' : displayDocType === 'document' ? 'Документ' : 'Справочник'}
             </div>
           )}
         </div>
