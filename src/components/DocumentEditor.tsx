@@ -11,6 +11,7 @@ import RelatedDocuments from './RelatedDocuments';
 import VersionHistory from './VersionHistory';
 import DocumentMetrics from './DocumentMetrics';
 import FileAttachments from './FileAttachments';
+import RichTextEditor from './RichTextEditor';
 
 interface DocumentEditorProps {
   documentId: string;
@@ -270,15 +271,10 @@ const DocumentEditor = ({
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Текст документа</label>
-                  <Textarea
-                    value={editedContent.text}
-                    onChange={(e) => setEditedContent({ ...editedContent, text: e.target.value })}
-                    className="min-h-[300px] font-mono"
-                    placeholder="Введите текст документа..."
+                  <RichTextEditor
+                    content={editedContent.text}
+                    onChange={(text) => setEditedContent({ ...editedContent, text })}
                   />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Поддерживается форматирование Markdown
-                  </p>
                 </div>
 
                 <Separator />
@@ -357,32 +353,7 @@ const DocumentEditor = ({
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="prose max-w-none">
-                  {content.text.split('\n').map((line, i) => {
-                    if (line.startsWith('# ')) {
-                      return (
-                        <h1 key={i} className="text-3xl font-bold mb-4">
-                          {line.substring(2)}
-                        </h1>
-                      );
-                    }
-                    if (line.startsWith('## ')) {
-                      return (
-                        <h2 key={i} className="text-2xl font-bold mb-3 mt-6">
-                          {line.substring(3)}
-                        </h2>
-                      );
-                    }
-                    if (line.trim() === '') {
-                      return <br key={i} />;
-                    }
-                    return (
-                      <p key={i} className="mb-2">
-                        {line}
-                      </p>
-                    );
-                  })}
-                </div>
+                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content.text }} />
 
                 {content.tables.length > 0 && (
                   <>
