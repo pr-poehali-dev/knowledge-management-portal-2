@@ -396,18 +396,18 @@ const DocumentEditor = ({
             </div>
           )}
 
-          {onUpdateAttachments && (
+          {attachments.length > 0 || (isEditing && onUpdateAttachments) ? (
             <div className="mt-6">
               <Card className="p-6">
                 <FileAttachments
                   attachments={attachments}
-                  onAdd={handleAddAttachment}
-                  onRemove={handleRemoveAttachment}
+                  onAdd={isEditing ? handleAddAttachment : undefined}
+                  onRemove={isEditing ? handleRemoveAttachment : undefined}
                   onDownload={handleDownloadAttachment}
                 />
               </Card>
             </div>
-          )}
+          ) : null}
         </div>
       </ScrollArea>
     </div>
