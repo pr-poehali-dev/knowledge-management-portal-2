@@ -178,6 +178,10 @@ const Index = () => {
       [selectedDirection]: findAndAddChild(folderStructures[selectedDirection], showAddDialog.parentId, newNode),
     });
 
+    if (showAddDialog.type === 'document') {
+      setSelectedSection(docType);
+    }
+
     setShowAddDialog(null);
     setNewItemName('');
     setNewItemDocType('instruction');
