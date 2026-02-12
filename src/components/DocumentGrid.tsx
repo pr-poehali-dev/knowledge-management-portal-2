@@ -33,12 +33,12 @@ const DocumentGrid = ({ selectedSection, filteredDocuments, filteredFolderDocume
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
-            <Icon name="Filter" size={18} className="mr-2" />
-            Фильтры
+            <Icon name="User" size={18} className="mr-2" />
+            Профиль
           </Button>
           <Button variant="outline">
-            <Icon name="Download" size={18} className="mr-2" />
-            Экспорт
+            <Icon name="Settings" size={18} className="mr-2" />
+            Настройки
           </Button>
         </div>
       </header>
