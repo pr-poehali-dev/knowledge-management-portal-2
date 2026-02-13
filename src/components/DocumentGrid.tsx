@@ -188,9 +188,6 @@ const DocumentGrid = ({ selectedSection, filteredDocuments, filteredFolderDocume
                       />
                     </div>
                   </div>
-                  <Badge variant="secondary" className="text-xs">
-                    {doc.folder}
-                  </Badge>
                 </div>
 
                 <h3 className="font-semibold mb-2 line-clamp-2">{doc.title}</h3>
