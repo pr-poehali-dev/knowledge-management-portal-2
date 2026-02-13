@@ -77,26 +77,6 @@ const AISearch = ({ onClose }: AISearchProps) => {
               </Card>
             </div>
           )}
-
-          {!query && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Примеры запросов</h3>
-              <div className="grid gap-3">
-                <Card className="p-4 cursor-pointer hover:bg-accent transition-colors" onClick={() => setQuery('Как настроить камеру видеонаблюдения?')}>
-                  <p className="font-medium">Как настроить камеру видеонаблюдения?</p>
-                  <p className="text-sm text-muted-foreground mt-1">Найдёт инструкции по настройке оборудования</p>
-                </Card>
-                <Card className="p-4 cursor-pointer hover:bg-accent transition-colors" onClick={() => setQuery('Процесс согласования закупки')}>
-                  <p className="font-medium">Процесс согласования закупки</p>
-                  <p className="text-sm text-muted-foreground mt-1">Покажет бизнес-процессы согласования</p>
-                </Card>
-                <Card className="p-4 cursor-pointer hover:bg-accent transition-colors" onClick={() => setQuery('Регламенты работы с документами')}>
-                  <p className="font-medium">Регламенты работы с документами</p>
-                  <p className="text-sm text-muted-foreground mt-1">Найдёт документы и регламенты</p>
-                </Card>
-              </div>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </main>
