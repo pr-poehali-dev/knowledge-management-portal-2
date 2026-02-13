@@ -149,7 +149,7 @@ const Index = () => {
   const handleAdd = () => {
     if (!showAddDialog || !newItemName.trim()) return;
 
-    const docType = showAddDialog.parentId === null ? currentDocType : newItemDocType;
+    const docType = showAddDialog.parentId === null ? selectedSection : newItemDocType;
 
     const now = new Date().toLocaleDateString('ru-RU');
     const newNode: FolderNode = {
