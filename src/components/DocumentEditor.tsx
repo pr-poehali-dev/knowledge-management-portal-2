@@ -443,12 +443,6 @@ const DocumentEditor = ({
             )}
           </Card>
 
-          {metrics && (
-            <div className="mt-6">
-              <DocumentMetrics metrics={metrics} />
-            </div>
-          )}
-
           {attachments.length > 0 || (isEditing && onUpdateAttachments) ? (
             <div className="mt-6">
               <Card className="p-6">
