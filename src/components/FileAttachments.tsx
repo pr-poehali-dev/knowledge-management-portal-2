@@ -10,9 +10,10 @@ interface FileAttachmentsProps {
   onAdd: (file: File) => void;
   onRemove: (attachmentId: string) => void;
   onDownload: (attachment: DocumentAttachment) => void;
+  isEditing?: boolean;
 }
 
-const FileAttachments = ({ attachments, onAdd, onRemove, onDownload }: FileAttachmentsProps) => {
+const FileAttachments = ({ attachments, onAdd, onRemove, onDownload, isEditing = true }: FileAttachmentsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -61,46 +62,52 @@ const FileAttachments = ({ attachments, onAdd, onRemove, onDownload }: FileAttac
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold">Прикрепленные файлы</h4>
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Icon name="Upload" size={14} className="mr-2" />
-          Добавить файл
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          onChange={handleFileSelect}
-          className="hidden"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-        />
+        {isEditing && (
+          <>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Icon name="Upload" size={14} className="mr-2" />
+              Добавить файл
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+            />
+          </>
+        )}
       </div>
 
-      <div
-        className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
-          dragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
-        }`}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-      >
-        <div className="flex flex-col items-center gap-2 text-center">
-          <Icon name="Upload" size={32} className="text-muted-foreground" />
-          <p className="text-sm font-medium">Перетащите файлы сюда</p>
-          <p className="text-xs text-muted-foreground">
-            Или нажмите кнопку "Добавить файл" выше
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Поддерживаются: PDF, Word, Excel, изображения
-          </p>
+      {isEditing && (
+        <div
+          className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+            dragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+        >
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Icon name="Upload" size={32} className="text-muted-foreground" />
+            <p className="text-sm font-medium">Перетащите файлы сюда</p>
+            <p className="text-xs text-muted-foreground">
+              Или нажмите кнопку "Добавить файл" выше
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Поддерживаются: PDF, Word, Excel, изображения
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {attachments.length > 0 && (
         <div className="space-y-2">
@@ -132,14 +139,16 @@ const FileAttachments = ({ attachments, onAdd, onRemove, onDownload }: FileAttac
                   >
                     <Icon name="Download" size={14} />
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onRemove(attachment.id)}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Icon name="Trash2" size={14} />
-                  </Button>
+                  {isEditing && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onRemove(attachment.id)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Icon name="Trash2" size={14} />
+                    </Button>
+                  )}
                 </div>
               </div>
             </Card>

@@ -454,9 +454,10 @@ const DocumentEditor = ({
               <Card className="p-6">
                 <FileAttachments
                   attachments={attachments}
-                  onAdd={isEditing ? handleAddAttachment : undefined}
-                  onRemove={isEditing ? handleRemoveAttachment : undefined}
+                  onAdd={handleAddAttachment}
+                  onRemove={handleRemoveAttachment}
                   onDownload={handleDownloadAttachment}
+                  isEditing={isEditing}
                 />
               </Card>
             </div>
