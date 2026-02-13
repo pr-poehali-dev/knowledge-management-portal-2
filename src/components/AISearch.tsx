@@ -41,6 +41,30 @@ const AISearch = ({ onClose }: AISearchProps) => {
       <ScrollArea className="flex-1 p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <Card className="p-6">
+            <h3 className="text-sm font-semibold mb-3">Ответ ИИ</h3>
+            <div className="min-h-[200px] p-4 bg-muted/30 rounded-lg">
+              {isSearching ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin">
+                      <Icon name="Loader2" size={48} className="text-primary" />
+                    </div>
+                    <p className="text-muted-foreground">Ищу релевантные документы...</p>
+                  </div>
+                </div>
+              ) : query ? (
+                <p className="text-sm text-muted-foreground">
+                  Функция AI-поиска находится в разработке
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Введите запрос ниже для начала поиска
+                </p>
+              )}
+            </div>
+          </Card>
+
+          <Card className="p-6">
             <div className="flex gap-2">
               <Input
                 placeholder="Задайте вопрос или опишите, что ищете..."
@@ -55,28 +79,6 @@ const AISearch = ({ onClose }: AISearchProps) => {
               </Button>
             </div>
           </Card>
-
-          {isSearching && (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex flex-col items-center gap-4">
-                <div className="animate-spin">
-                  <Icon name="Loader2" size={48} className="text-primary" />
-                </div>
-                <p className="text-muted-foreground">Ищу релевантные документы...</p>
-              </div>
-            </div>
-          )}
-
-          {!isSearching && query && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Результаты поиска</h3>
-              <Card className="p-4">
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Функция AI-поиска находится в разработке
-                </p>
-              </Card>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </main>
