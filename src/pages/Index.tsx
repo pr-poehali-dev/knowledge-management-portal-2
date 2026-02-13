@@ -213,14 +213,21 @@ const Index = () => {
 
   const handleSaveDocument = (content: DocumentContent) => {
     if (!openedDocument) return;
+    
+    const updatedStructure = findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
+      ...node,
+      content,
+    }));
+    
     setFolderStructures({
       ...folderStructures,
-      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], openedDocument.id, (node) => ({
-        ...node,
-        content,
-      })),
+      [selectedDirection]: updatedStructure,
     });
-    setOpenedDocument({ ...openedDocument, content });
+    
+    const updatedNode = findNodeById(updatedStructure, openedDocument.id);
+    if (updatedNode) {
+      setOpenedDocument(updatedNode);
+    }
   };
 
   const handleUpdateVersions = (versions: DocumentVersion[]) => {
