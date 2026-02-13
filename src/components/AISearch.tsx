@@ -41,7 +41,6 @@ const AISearch = ({ onClose }: AISearchProps) => {
       <ScrollArea className="flex-1 p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <Card className="p-6">
-            <h3 className="text-sm font-semibold mb-3">Ответ ИИ</h3>
             <div className="min-h-[200px] p-4 bg-muted/30 rounded-lg">
               {isSearching ? (
                 <div className="flex items-center justify-center h-full">
