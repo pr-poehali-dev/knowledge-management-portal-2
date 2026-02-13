@@ -129,13 +129,23 @@ const Index = () => {
   };
 
   const handleRename = (nodeId: string, newName: string) => {
+    const updatedStructure = findAndUpdateNode(folderStructures[selectedDirection], nodeId, (node) => ({
+      ...node,
+      name: newName,
+    }));
+    
     setFolderStructures({
       ...folderStructures,
-      [selectedDirection]: findAndUpdateNode(folderStructures[selectedDirection], nodeId, (node) => ({
-        ...node,
-        name: newName,
-      })),
+      [selectedDirection]: updatedStructure,
     });
+    
+    if (openedDocument && openedDocument.id === nodeId) {
+      const updatedNode = findNodeById(updatedStructure, nodeId);
+      if (updatedNode) {
+        setOpenedDocument(updatedNode);
+      }
+    }
+    
     setEditingNode(null);
   };
 
@@ -342,6 +352,7 @@ const Index = () => {
           onUpdateVersions={handleUpdateVersions}
           onUpdateMetrics={handleUpdateMetrics}
           onUpdateAttachments={handleUpdateAttachments}
+          onRename={(newName) => handleRename(openedDocument.id, newName)}
         />
       ) : (
         <DocumentGrid

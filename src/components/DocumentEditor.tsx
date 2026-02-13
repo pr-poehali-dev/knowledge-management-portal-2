@@ -27,6 +27,7 @@ interface DocumentEditorProps {
   onUpdateVersions?: (versions: DocumentVersion[]) => void;
   onUpdateMetrics?: (metrics: MetricsType) => void;
   onUpdateAttachments?: (attachments: DocumentAttachment[]) => void;
+  onRename?: (newName: string) => void;
 }
 
 const DocumentEditor = ({ 
@@ -41,16 +42,30 @@ const DocumentEditor = ({
   attachments = [],
   onUpdateVersions,
   onUpdateMetrics,
-  onUpdateAttachments
+  onUpdateAttachments,
+  onRename
 }: DocumentEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState<DocumentContent>(content);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(documentName);
 
   useEffect(() => {
     setEditedContent(content);
   }, [content]);
+
+  useEffect(() => {
+    setEditedName(documentName);
+  }, [documentName]);
+
+  const handleNameSave = () => {
+    if (onRename && editedName.trim()) {
+      onRename(editedName.trim());
+    }
+    setIsEditingName(false);
+  };
 
   const handleSave = () => {
     onSave(editedContent);
@@ -209,7 +224,41 @@ const DocumentEditor = ({
           </Button>
           <Separator orientation="vertical" className="h-6" />
           <div>
-            <h2 className="text-xl font-bold">{documentName}</h2>
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleNameSave();
+                    if (e.key === 'Escape') {
+                      setEditedName(documentName);
+                      setIsEditingName(false);
+                    }
+                  }}
+                  className="h-8 text-lg font-bold"
+                  autoFocus
+                />
+                <Button size="sm" variant="ghost" onClick={handleNameSave}>
+                  <Icon name="Check" size={16} />
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => {
+                  setEditedName(documentName);
+                  setIsEditingName(false);
+                }}>
+                  <Icon name="X" size={16} />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold">{documentName}</h2>
+                {onRename && (
+                  <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}>
+                    <Icon name="Pencil" size={14} />
+                  </Button>
+                )}
+              </div>
+            )}
             <p className="text-sm text-muted-foreground">
               {isEditing ? 'Режим редактирования' : 'Режим просмотра'}
             </p>
