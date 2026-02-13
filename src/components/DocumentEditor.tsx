@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -47,6 +47,10 @@ const DocumentEditor = ({
   const [editedContent, setEditedContent] = useState<DocumentContent>(content);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+
+  useEffect(() => {
+    setEditedContent(content);
+  }, [content]);
 
   const handleSave = () => {
     onSave(editedContent);
