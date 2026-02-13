@@ -168,7 +168,7 @@ const KnowledgeSidebar = ({
         <div className="relative">
           <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Поиск по базе знаний..."
+            placeholder="Поиск с AI"
             className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
