@@ -250,8 +250,8 @@ const DocumentEditor = ({
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">{documentName}</h2>
+              <div className="flex items-center gap-2 max-w-2xl">
+                <h2 className="text-xl font-bold truncate">{documentName}</h2>
                 {onRename && (
                   <Button size="sm" variant="ghost" onClick={() => setIsEditingName(true)}>
                     <Icon name="Pencil" size={14} />
