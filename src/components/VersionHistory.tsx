@@ -35,25 +35,6 @@ const VersionHistory = ({ versions, currentContent, onRestore, onSaveAsVersion }
 
   return (
     <div>
-      <div className="flex gap-2">
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={() => setShowHistory(true)}
-        >
-          <Icon name="History" size={14} className="mr-2" />
-          История ({versions.length})
-        </Button>
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={() => setShowSaveDialog(true)}
-        >
-          <Icon name="Save" size={14} className="mr-2" />
-          Сохранить версию
-        </Button>
-      </div>
-
       <Dialog open={showHistory} onOpenChange={setShowHistory}>
         <DialogContent className="max-w-4xl max-h-[80vh]">
           <DialogHeader>
