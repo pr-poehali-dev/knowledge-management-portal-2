@@ -32,6 +32,7 @@ interface KnowledgeSidebarProps {
   onOpenDocument: (nodeId: string) => void;
   currentDocType: DocumentType;
   setCurrentDocType: (type: DocumentType) => void;
+  onOpenAISearch: () => void;
 }
 
 const KnowledgeSidebar = ({
@@ -54,6 +55,7 @@ const KnowledgeSidebar = ({
   onOpenDocument,
   currentDocType,
   setCurrentDocType,
+  onOpenAISearch,
 }: KnowledgeSidebarProps) => {
   const renderFolderTree = (nodes: FolderNode[], level = 0) => {
     return nodes.map((node) => (
@@ -165,15 +167,14 @@ const KnowledgeSidebar = ({
             <p className="text-xs text-muted-foreground">ГБУ ЦИР ПК</p>
           </div>
         </div>
-        <div className="relative">
-          <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Поиск с AI"
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <Button 
+          variant="outline" 
+          className="w-full justify-start"
+          onClick={onOpenAISearch}
+        >
+          <Icon name="Search" size={18} className="mr-2" />
+          Поиск с AI
+        </Button>
       </div>
 
       <ScrollArea className="flex-1 p-4">

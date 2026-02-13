@@ -4,6 +4,7 @@ import KnowledgeSidebar from '@/components/KnowledgeSidebar';
 import DocumentGrid from '@/components/DocumentGrid';
 import AddItemDialog from '@/components/AddItemDialog';
 import DocumentEditor from '@/components/DocumentEditor';
+import AISearch from '@/components/AISearch';
 
 const Index = () => {
   const [selectedDirection, setSelectedDirection] = useState<Direction>('safe-city');
@@ -19,6 +20,7 @@ const Index = () => {
   const [newItemName, setNewItemName] = useState('');
   const [newItemDocType, setNewItemDocType] = useState<DocumentType>('instruction');
   const [currentDocType, setCurrentDocType] = useState<DocumentType>('instruction');
+  const [showAISearch, setShowAISearch] = useState(false);
 
   const sampleDocuments: Document[] = [
     {
@@ -335,9 +337,12 @@ const Index = () => {
         onOpenDocument={handleOpenDocument}
         currentDocType={currentDocType}
         setCurrentDocType={setCurrentDocType}
+        onOpenAISearch={() => setShowAISearch(true)}
       />
 
-      {openedDocument ? (
+      {showAISearch ? (
+        <AISearch onClose={() => setShowAISearch(false)} />
+      ) : openedDocument ? (
         <DocumentEditor
           documentId={openedDocument.id}
           documentName={openedDocument.name}
